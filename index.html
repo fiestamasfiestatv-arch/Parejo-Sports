@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PAREJO ORIGINALES | Zapatillas</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;color:#171717;background:#fff}
+header{background:#111;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.logo{font-weight:900;font-size:21px;letter-spacing:1px}
+.logo span{color:#d9b66f}
+button,input,select{font:inherit}
+button{cursor:pointer}
+header button,.cta{background:#d9b66f;color:#111;border:0;border-radius:8px;padding:12px;font-weight:bold}
+main{max-width:1100px;margin:auto;padding:22px}
+.hero{background:#191919;color:white;padding:35px;border-radius:16px;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:20px}
+.hero h1{font-size:clamp(32px,5vw,52px);margin:12px 0}
+.hero p{line-height:1.6;color:#ddd}
+.hero img{width:100%;border-radius:12px;object-fit:cover}
+.gold{color:#d9b66f;font-weight:bold}
+h2{margin-top:32px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin:20px 0}
+.filters input,.filters select{padding:12px;border:1px solid #ddd;border-radius:8px;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{border:1px solid #e6e6e6;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.photo{background:#f5f3ef;aspect-ratio:1;display:grid;place-items:center}
+.photo img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.details{padding:14px;display:flex;flex-direction:column;gap:9px;flex:1}
+.details h3{margin:0}
+.muted{color:#777;font-size:13px}
+.price{font-size:20px;font-weight:bold}
+.sizes{display:flex;gap:5px;flex-wrap:wrap}
+.size{background:white;border:1px solid #ccc;border-radius:5px;padding:6px 9px}
+.size.selected{background:#111;color:white}
+.add{background:#111;color:white;border:0;border-radius:7px;padding:12px;margin-top:auto}
+footer{background:#111;color:white;text-align:center;padding:25px;margin-top:40px}
+.cart{display:none;position:fixed;inset:0;background:#0008;z-index:5}
+.cart.open{display:block}
+.panel{position:absolute;right:0;top:0;height:100%;width:min(420px,100%);background:white;padding:22px;overflow:auto}
+.cartline{padding:14px 0;border-bottom:1px solid #ddd}
+.cartline button{margin:6px 4px 0 0}
+.total{font-size:21px;font-weight:bold;padding:20px 0}
+.whatsapp{width:100%;padding:14px;border:0;border-radius:8px;background:#168447;color:white;font-weight:bold}
+@media(max-width:650px){
+ main{padding:14px}.hero{grid-template-columns:1fr;padding:23px}
+ .hero img{max-height:220px;object-fit:contain}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .filters{grid-template-columns:1fr 1fr}
+ .filters input{grid-column:1/-1}
+ .details{padding:10px}.details h3{font-size:14px}
+ .logo{font-size:16px}
+}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">PAREJO <span>ORIGINALES</span></div>
+ <button id="openCart">🛍 Carrito (<span id="count">0</span>)</button>
+</header>
+<main>
+ <section class="hero">
+  <div>
+   <div class="gold">ESTILO · COMODIDAD · ACTITUD</div>
+   <h1>Encuentra tu próximo par.</h1>
+   <p>Descubre zapatillas urbanas y deportivas. Elige tu modelo, selecciona tu talla y prepara tu pedido.</p>
+   <a class="cta" href="#catalogo" style="display:inline-block;text-decoration:none">VER CATÁLOGO ↓</a>
+  </div>
+  <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80" alt="Zapatilla deportiva">
+ </section>
+ <section id="catalogo">
+  <h2>Catálogo de zapatillas</h2>
+  <p class="muted">Productos y precios de demostración. Configura tu inventario real antes de vender.</p>
+  <div class="filters">
+   <input id="search" placeholder="Buscar zapatillas..." aria-label="Buscar">
+   <select id="category">
+    <option value="">Todas las categorías</option>
+    <option>Urbana</option><option>Deportiva</option><option>Casual</option>
+   </select>
+   <select id="sort">
+    <option value="featured">Destacados</option>
+    <option value="low">Precio menor</option>
+    <option value="high">Precio mayor</option>
+   </select>
+  </div>
+  <div id="products" class="grid"></div>
+ </section>
+</main>
+<footer><span class="gold">PAREJO ORIGINALES</span><p>Catálogo online · Pedidos por WhatsApp</p></footer>
+<div id="cart" class="cart">
+ <div id="panel" class="panel">
+  <button id="closeCart">← Seguir comprando</button>
+  <h2>Tu carrito</h2>
+  <div id="items"></div>
+  <div class="total">Total: <span id="total">S/ 0.00</span></div>
+  <button class="whatsapp" id="checkout">Continuar por WhatsApp</button>
+  <p class="muted">Pedido sujeto a confirmación de stock y entrega.</p>
+ </div>
+</div>
+<script>
+const WHATSAPP_NUMBER = ""; // Número de la tienda, con código de país y solo dígitos.
+const products = [
+ {id:1,name:"Runner Rojo",category:"Deportiva",price:129.90,sizes:[38,39,40,41,42],image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80"},
+ {id:2,name:"Urban Classic",category:"Urbana",price:149.90,sizes:[38,39,40,41,42,43],image:"https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80"},
+ {id:3,name:"Street White",category:"Casual",price:119.90,sizes:[36,37,38,39,40,41],image:"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=600&q=80"},
+ {id:4,name:"Sport Black",category:"Deportiva",price:159.90,sizes:[39,40,41,42,43],image:"https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=600&q=80"},
+ {id:5,name:"Daily Beige",category:"Casual",price:109.90,sizes:[36,37,38,39,40,41],image:"https://images.unsplash.com/photo-1495555961986-6d4c1ecb7be3?auto=format&fit=crop&w=600&q=80"},
+ {id:6,name:"City Low",category:"Urbana",price:139.90,sizes:[38,39,40,41,42,43],image:"https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=600&q=80"}
+];
+const cartItems=[];
+const selected={};
+const money=n=>"S/ "+n.toFixed(2);
+function renderProducts(){
+ const term=document.getElementById("search").value.toLowerCase().trim();
+ const cat=document.getElementById("category").value;
+ let list=products.filter(p=>(p.name+" "+p.category).toLowerCase().includes(term)&&(!cat||p.category===cat));
+ const sort=document.getElementById("sort").value;
+ if(sort==="low")list.sort((a,b)=>a.price-b.price);
+ if(sort==="high")list.sort((a,b)=>b.price-a.price);
+ document.getElementById("products").innerHTML=list.length?list.map(p=>`
+ <article class="card">
+  <div class="photo"><img src="${p.image}" alt="${p.name}" loading="lazy"></div>
+  <div class="details">
+   <span class="gold">${p.category}</span><h3>${p.name}</h3>
+   <div class="price">${money(p.price)}</div>
+   <div class="sizes">${p.sizes.map(s=>`<button class="size ${selected[p.id]===s?"selected":""}" data-size="${s}" data-id="${p.id}">${s}</button>`).join("")}</div>
+   <button class="add" data-add="${p.id}">Agregar al carrito</button>
+  </div>
+ </article>`).join(""):'<p>No se encontraron productos.</p>';
+ document.querySelectorAll("[data-size]").forEach(b=>b.onclick=()=>{selected[b.dataset.id]=Number(b.dataset.size);renderProducts()});
+ document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>add(Number(b.dataset.add)));
+}
+function add(id){
+ const size=selected[id];
+ if(!size){alert("Selecciona una talla primero.");return}
+ const found=cartItems.find(x=>x.id===id&&x.size===size);
+ if(found)found.qty++;
+ else cartItems.push({id,size,qty:1});
+ renderCart();
+ document.getElementById("cart").classList.add("open");
+}
+function renderCart(){
+ document.getElementById("count").textContent=cartItems.reduce((n,x)=>n+x.qty,0);
+ const total=cartItems.reduce((n,x)=>n+products.find(p=>p.id===x.id).price*x.qty,0);
+ document.getElementById("total").textContent=money(total);
+ document.getElementById("items").innerHTML=cartItems.length?cartItems.map((x,i)=>{
+ const p=products.find(y=>y.id===x.id);
+ return `<div class="cartline"><b>${p.name}</b><br><span class="muted">Talla ${x.size} · ${money(p.price)} c/u</span><br>
+ <button data-minus="${i}">−</button> ${x.qty} <button data-plus="${i}">+</button> <button data-del="${i}">Eliminar</button></div>`;
+ }).join(""):"<p>Tu carrito está vacío.</p>";
+ document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>{let i=+b.dataset.minus;cartItems[i].qty--;if(cartItems[i].qty<1)cartItems.splice(i,1);renderCart()});
+ document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>{cartItems[+b.dataset.plus].qty++;renderCart()});
+ document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{cartItems.splice(+b.dataset.del,1);renderCart()});
+}
+document.getElementById("search").oninput=renderProducts;
+document.getElementById("category").onchange=renderProducts;
+document.getElementById("sort").onchange=renderProducts;
+document.getElementById("openCart").onclick=()=>document.getElementById("cart").classList.add("open");
+document.getElementById("closeCart").onclick=()=>document.getElementById("cart").classList.remove("open");
+document.getElementById("checkout").onclick=()=>{
+ if(!cartItems.length){alert("Tu carrito está vacío.");return}
+ if(!/^\d{10,15}$/.test(WHATSAPP_NUMBER)){alert("Primero configura el número de WhatsApp de la tienda en el código.");return}
+ const lines=cartItems.map(x=>{const p=products.find(y=>y.id===x.id);return `${p.name}, talla ${x.size}, cantidad ${x.qty} — ${money(p.price*x.qty)}`});
+ const total=cartItems.reduce((n,x)=>n+products.find(p=>p.id===x.id).price*x.qty,0);
+ const msg=`Hola, PAREJO ORIGINALES. Quiero consultar este pedido:\n${lines.join("\n")}\nTotal referencial: ${money(total)}\n¿Me confirman disponibilidad?`;
+ window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+encodeURIComponent(msg),"_blank");
+};
+renderProducts();renderCart();
+</script>
+</body>
+</html>
